@@ -1,0 +1,196 @@
+Howto Install AVRISP-MKII
+
+1 - View device information using lsusb command:
+
+# lsusb
+Bus 002 Device 013: ID 03eb:2104 Atmel Corp. AVR ISP mkII 
+
+2 - View udev information using udevadm command:
+
+Replace <Bus> and <Device> according to lsusb output 
+
+# udevadm info  --name=/dev/bus/usb/002/013 --query=all
+P: /devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2
+N: bus/usb/002/006
+E: BUSNUM=002
+E: DEVNAME=/dev/bus/usb/002/006
+E: DEVNUM=006
+E: DEVPATH=/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2
+E: DEVTYPE=usb_device
+E: DRIVER=usb
+E: ID_BUS=usb
+E: ID_MODEL=AVRISP_mkII
+E: ID_MODEL_ENC=AVRISP\x20mkII
+E: ID_MODEL_FROM_DATABASE=AVR ISP mkII
+E: ID_MODEL_ID=2104
+E: ID_REVISION=0200
+E: ID_SERIAL=ATMEL_AVRISP_mkII_000200012345
+E: ID_SERIAL_SHORT=000200012345
+E: ID_USB_INTERFACES=:ff0000:
+E: ID_VENDOR=ATMEL
+E: ID_VENDOR_ENC=ATMEL
+E: ID_VENDOR_FROM_DATABASE=Atmel Corp.
+E: ID_VENDOR_ID=03eb
+E: MAJOR=189
+E: MINOR=133
+E: PRODUCT=3eb/2104/200
+E: SUBSYSTEM=usb
+E: TYPE=255/0/0
+E: USEC_INITIALIZED=15266942439
+
+# udevadm info --attribute-walk --name=/dev/bus/usb/<Bus>/<Device>
+
+shows among many other things
+
+    SUBSYSTEM=="usb"
+
+    ATTR{idVendor}=="03eb"
+
+    ATTR{idProduct}=="2104"
+
+# udevadm info --attribute-walk --name=/dev/bus/usb/002/013
+Udevadm info starts with the device specified by the devpath and then
+walks up the chain of parent devices. It prints for every device
+found, all possible attributes in the udev rules key format.
+A rule to match, can be composed by the attributes of the device
+and the attributes from one single parent device.
+
+  looking at device '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2':
+    KERNEL=="2-1.2"
+    SUBSYSTEM=="usb"
+    DRIVER=="usb"
+    ATTR{bDeviceSubClass}=="00"
+    ATTR{bDeviceProtocol}=="00"
+    ATTR{devpath}=="1.2"
+    ATTR{idVendor}=="03eb"
+    ATTR{speed}=="12"
+    ATTR{bNumInterfaces}==" 1"
+    ATTR{bConfigurationValue}=="1"
+    ATTR{bMaxPacketSize0}=="16"
+    ATTR{busnum}=="2"
+    ATTR{devnum}=="13"
+    ATTR{configuration}==""
+    ATTR{bMaxPower}=="100mA"
+    ATTR{authorized}=="1"
+    ATTR{bmAttributes}=="c0"
+    ATTR{bNumConfigurations}=="1"
+    ATTR{maxchild}=="0"
+    ATTR{bcdDevice}=="0200"
+    ATTR{avoid_reset_quirk}=="0"
+    ATTR{quirks}=="0x0"
+    ATTR{serial}=="000200012345"
+    ATTR{version}==" 1.10"
+    ATTR{urbnum}=="10"
+    ATTR{ltm_capable}=="no"
+    ATTR{manufacturer}=="ATMEL"
+    ATTR{removable}=="removable"
+    ATTR{idProduct}=="2104"
+    ATTR{bDeviceClass}=="ff"
+    ATTR{product}=="AVRISP mkII"
+
+  looking at parent device '/devices/pci0000:00/0000:00:1d.0/usb2/2-1':
+    KERNELS=="2-1"
+    SUBSYSTEMS=="usb"
+    DRIVERS=="usb"
+    ATTRS{bDeviceSubClass}=="00"
+    ATTRS{bDeviceProtocol}=="01"
+    ATTRS{devpath}=="1"
+    ATTRS{idVendor}=="8087"
+    ATTRS{speed}=="480"
+    ATTRS{bNumInterfaces}==" 1"
+    ATTRS{bConfigurationValue}=="1"
+    ATTRS{bMaxPacketSize0}=="64"
+    ATTRS{busnum}=="2"
+    ATTRS{devnum}=="2"
+    ATTRS{configuration}==""
+    ATTRS{bMaxPower}=="0mA"
+    ATTRS{authorized}=="1"
+    ATTRS{bmAttributes}=="e0"
+    ATTRS{bNumConfigurations}=="1"
+    ATTRS{maxchild}=="8"
+    ATTRS{bcdDevice}=="0000"
+    ATTRS{avoid_reset_quirk}=="0"
+    ATTRS{quirks}=="0x0"
+    ATTRS{version}==" 2.00"
+    ATTRS{urbnum}=="314"
+    ATTRS{ltm_capable}=="no"
+    ATTRS{removable}=="unknown"
+    ATTRS{idProduct}=="0020"
+    ATTRS{bDeviceClass}=="09"
+
+  looking at parent device '/devices/pci0000:00/0000:00:1d.0/usb2':
+    KERNELS=="usb2"
+    SUBSYSTEMS=="usb"
+    DRIVERS=="usb"
+    ATTRS{bDeviceSubClass}=="00"
+    ATTRS{bDeviceProtocol}=="00"
+    ATTRS{devpath}=="0"
+    ATTRS{idVendor}=="1d6b"
+    ATTRS{speed}=="480"
+    ATTRS{bNumInterfaces}==" 1"
+    ATTRS{bConfigurationValue}=="1"
+    ATTRS{bMaxPacketSize0}=="64"
+    ATTRS{authorized_default}=="1"
+    ATTRS{busnum}=="2"
+    ATTRS{devnum}=="1"
+    ATTRS{configuration}==""
+    ATTRS{bMaxPower}=="0mA"
+    ATTRS{authorized}=="1"
+    ATTRS{bmAttributes}=="e0"
+    ATTRS{bNumConfigurations}=="1"
+    ATTRS{maxchild}=="2"
+    ATTRS{bcdDevice}=="0313"
+    ATTRS{avoid_reset_quirk}=="0"
+    ATTRS{quirks}=="0x0"
+    ATTRS{serial}=="0000:00:1d.0"
+    ATTRS{version}==" 2.00"
+    ATTRS{urbnum}=="104"
+    ATTRS{ltm_capable}=="no"
+    ATTRS{manufacturer}=="Linux 3.13.0-59-generic ehci_hcd"
+    ATTRS{removable}=="unknown"
+    ATTRS{idProduct}=="0002"
+    ATTRS{bDeviceClass}=="09"
+    ATTRS{product}=="EHCI Host Controller"
+
+  looking at parent device '/devices/pci0000:00/0000:00:1d.0':
+    KERNELS=="0000:00:1d.0"
+    SUBSYSTEMS=="pci"
+    DRIVERS=="ehci-pci"
+    ATTRS{irq}=="23"
+    ATTRS{subsystem_vendor}=="0x104d"
+    ATTRS{broken_parity_status}=="0"
+    ATTRS{class}=="0x0c0320"
+    ATTRS{companion}==""
+    ATTRS{consistent_dma_mask_bits}=="32"
+    ATTRS{dma_mask_bits}=="32"
+    ATTRS{local_cpus}=="00000000,00000000,00000000,00000000,00000000,00000000,00000000,0000000f"
+    ATTRS{device}=="0x3b34"
+    ATTRS{uframe_periodic_max}=="100"
+    ATTRS{enable}=="1"
+    ATTRS{msi_bus}==""
+    ATTRS{local_cpulist}=="0-3"
+    ATTRS{vendor}=="0x8086"
+    ATTRS{subsystem_device}=="0x9071"
+    ATTRS{numa_node}=="-1"
+    ATTRS{d3cold_allowed}=="1"
+
+  looking at parent device '/devices/pci0000:00':
+    KERNELS=="pci0000:00"
+    SUBSYSTEMS==""
+    DRIVERS==""
+
+
+	3 - Create new file /etc/udev/avrisp.rules 
+
+# Atmel Corp. AVRISP mkII
+SUBSYSTEM=="usb", ATTR{idVendor}=="03eb", ATTR{idProduct}=="2104", MODE="0666", GROUP="uucp"
+
+Create a virtual link to the file and give it a rule priority
+# cd /etc/udev/rules.d
+# sudo ln ../avrisp.rules 60-avrisp.rules
+
+Check you're in the uucp group
+# groups
+
+Restart udev
+# sudo restart udev
